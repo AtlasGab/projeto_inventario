@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Controle de Estoque</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">Controle de Estoque</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuTopo" aria-controls="menuTopo" aria-expanded="false" aria-label="Abrir menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="menuTopo">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <span class="nav-link">{{ request.user.username }}</span>
+                    </li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-link text-danger border-0 bg-transparent">Sair</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-lg-2 p-0">
+                <div class="sidebar d-flex flex-column p-3">
+                    <h5 class="text-center text-white mb-4">Menu</h5>
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'dashboard' %}" class="nav-link active">Dashboard</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'estoque' %}" class="nav-link">Consulta de Estoque</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'cadastro_material' %}" class="nav-link">Cadastro de Material</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'entrada_material' %}" class="nav-link">Entrada de Material</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'retirada_material' %}" class="nav-link">Retirada de Material</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'emprestimo' %}" class="nav-link">Empréstimos</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'devolucao' %}" class="nav-link">Devoluções</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'historico' %}" class="nav-link">Histórico de Movimentações</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'relatorios' %}" class="nav-link">Relatórios</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'usuarios' %}" class="nav-link">Gerenciamento de Usuários</a>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+
+            <main class="col-lg-10 p-4">
+                <div class="mb-4">
+                    <h2 class="fw-bold">Dashboard</h2>
+                    <p class="dashboard-descricao">Visão geral do sistema de controle de estoque.</p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card shadow-sm rounded-4 h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted">Materiais Cadastrados</h6>
+                                <h2 class="fw-bold text-dark">--</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card shadow-sm rounded-4 h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted">Entradas Registradas</h6>
+                                <h2 class="fw-bold text-dark">--</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card shadow-sm rounded-4 h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted">Retiradas Registradas</h6>
+                                <h2 class="fw-bold text-dark">--</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card shadow-sm rounded-4 h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted">Estoque Crítico</h6>
+                                <h2 class="fw-bold text-dark">--</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mt-4">
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm rounded-4 h-100">
+                            <div class="card-header bg-white fw-bold">Itens com Estoque Crítico</div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Material</th>
+                                                <th>Quantidade</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="3" class="text-center text-muted py-4">Nenhum registro encontrado.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm rounded-4 h-100">
+                            <div class="card-header bg-white fw-bold">Últimas Movimentações Realizadas</div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Data</th>
+                                                <th>Material</th>
+                                                <th>Tipo</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="3" class="text-center text-muted py-4">Nenhuma movimentação registrada.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

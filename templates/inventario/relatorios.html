@@ -1,0 +1,161 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">Controle de Estoque</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuTopo" aria-controls="menuTopo" aria-expanded="false" aria-label="Abrir menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="menuTopo">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item"><span class="nav-link">{{ request.user.username }}</span></li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-link text-danger border-0 bg-transparent">Sair</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-lg-2 p-0">
+                <div class="sidebar d-flex flex-column p-3">
+                    <h5 class="text-center mb-4">Menu</h5>
+                    <hr>
+                    <ul class="nav nav-pills flex-column">
+                        <li class="mb-2"><a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a></li>
+                        <li class="mb-2"><a href="{% url 'estoque' %}" class="nav-link">Consulta de Estoque</a></li>
+                        <li class="mb-2"><a href="{% url 'cadastro_material' %}" class="nav-link">Cadastro de Material</a></li>
+                        <li class="mb-2"><a href="{% url 'entrada_material' %}" class="nav-link">Entrada de Material</a></li>
+                        <li class="mb-2"><a href="{% url 'retirada_material' %}" class="nav-link">Retirada de Material</a></li>
+                        <li class="mb-2"><a href="{% url 'emprestimo' %}" class="nav-link">Empréstimos</a></li>
+                        <li class="mb-2"><a href="{% url 'devolucao' %}" class="nav-link">Devoluções</a></li>
+                        <li class="mb-2"><a href="{% url 'historico' %}" class="nav-link">Histórico de Movimentações</a></li>
+                        <li class="mb-2"><a href="{% url 'relatorios' %}" class="nav-link active">Relatórios</a></li>
+                        <li class="mb-2"><a href="{% url 'usuarios' %}" class="nav-link">Gerenciamento de Usuários</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <main class="col-lg-10 p-4">
+                <div class="mb-4">
+                    <h2 class="fw-bold">Relatórios</h2>
+                    <p class="dashboard-descricao">Consulte e gere relatórios gerenciais do estoque.</p>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-white fw-semibold">Filtros do relatório</div>
+                    <div class="card-body">
+                        <form method="get">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="date" class="form-control" id="dataInicio" name="data_inicio" value="{{ request.GET.data_inicio }}">
+                                        <label for="dataInicio">Data inicial</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="date" class="form-control" id="dataFim" name="data_fim" value="{{ request.GET.data_fim }}">
+                                        <label for="dataFim">Data final</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="setor" name="setor" placeholder="Setor" value="{{ request.GET.setor }}">
+                                        <label for="setor">Setor</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="categoria" name="categoria">
+                                            <option value="" {% if not request.GET.categoria %}selected{% endif %}>Todas as categorias</option>
+                                            {% for categoria in categorias %}
+                                                <option value="{{ categoria }}" {% if request.GET.categoria == categoria %}selected{% endif %}>{{ categoria }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label for="categoria">Categoria</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="material" name="material">
+                                            <option value="" {% if not request.GET.material %}selected{% endif %}>Todos os materiais</option>
+                                            {% for item in materiais %}
+                                                <option value="{{ item.id }}" {% if request.GET.material == item.id|stringformat:"s" %}selected{% endif %}>{{ item.nome }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label for="material">Material</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="tipoRelatorio" name="tipo_relatorio" required>
+                                            <option value="" disabled {% if not request.GET.tipo_relatorio %}selected{% endif %}>Selecione um relatório</option>
+                                            <option value="consumo-periodo" {% if request.GET.tipo_relatorio == 'consumo-periodo' %}selected{% endif %}>Consumo por período</option>
+                                            <option value="consumo-setor" {% if request.GET.tipo_relatorio == 'consumo-setor' %}selected{% endif %}>Consumo por setor</option>
+                                            <option value="estoque-critico" {% if request.GET.tipo_relatorio == 'estoque-critico' %}selected{% endif %}>Estoque crítico</option>
+                                            <option value="movimentacoes" {% if request.GET.tipo_relatorio == 'movimentacoes' %}selected{% endif %}>Movimentações</option>
+                                        </select>
+                                        <label for="tipoRelatorio">Tipo de relatório</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3 d-flex flex-wrap gap-2">
+                                <button type="submit" class="btn btn-roxo px-4">Gerar relatório</button>
+                                <button type="button" class="btn btn-outline-primary px-4" onclick="window.print()">Exportar PDF</button>
+                                <button type="button" class="btn btn-outline-success px-4" onclick="alert('A exportação para Excel ainda precisa ser implementada na view.')">Exportar Excel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 mt-4">
+                    <div class="card-header bg-white fw-semibold">Resultado do relatório</div>
+                    <div class="card-body">
+                        {% if resultados %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            {% for coluna in colunas %}
+                                                <th>{{ coluna }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for linha in resultados %}
+                                            <tr>
+                                                {% for valor in linha %}
+                                                    <td>{{ valor }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted mb-0">Selecione os filtros e gere um relatório para visualizar os resultados.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

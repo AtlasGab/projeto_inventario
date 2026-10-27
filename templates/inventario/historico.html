@@ -1,0 +1,156 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Movimentações</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">Controle de Estoque</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuTopo" aria-controls="menuTopo" aria-expanded="false" aria-label="Abrir menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="menuTopo">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item"><span class="nav-link">{{ request.user.username }}</span></li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-link text-danger border-0 bg-transparent">Sair</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-lg-2 p-0">
+                <div class="sidebar d-flex flex-column p-3">
+                    <h5 class="text-center mb-4">Menu</h5>
+                    <hr>
+                    <ul class="nav nav-pills flex-column">
+                        <li class="mb-2"><a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a></li>
+                        <li class="mb-2"><a href="{% url 'estoque' %}" class="nav-link">Consulta de Estoque</a></li>
+                        <li class="mb-2"><a href="{% url 'cadastro_material' %}" class="nav-link">Cadastro de Material</a></li>
+                        <li class="mb-2"><a href="{% url 'entrada_material' %}" class="nav-link">Entrada de Material</a></li>
+                        <li class="mb-2"><a href="{% url 'retirada_material' %}" class="nav-link">Retirada de Material</a></li>
+                        <li class="mb-2"><a href="{% url 'emprestimo' %}" class="nav-link">Empréstimos</a></li>
+                        <li class="mb-2"><a href="{% url 'devolucao' %}" class="nav-link">Devoluções</a></li>
+                        <li class="mb-2"><a href="{% url 'historico' %}" class="nav-link active">Histórico de Movimentações</a></li>
+                        <li class="mb-2"><a href="{% url 'relatorios' %}" class="nav-link">Relatórios</a></li>
+                        <li class="mb-2"><a href="{% url 'usuarios' %}" class="nav-link">Gerenciamento de Usuários</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <main class="col-lg-10 p-4">
+                <div class="mb-4">
+                    <h2 class="fw-bold">Histórico de Movimentações</h2>
+                    <p class="dashboard-descricao">Consulte as movimentações realizadas no sistema.</p>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-white fw-semibold">Filtros de pesquisa</div>
+                    <div class="card-body">
+                        <form method="get">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="date" class="form-control" id="dataInicio" name="data_inicio" value="{{ request.GET.data_inicio }}">
+                                        <label for="dataInicio">Data inicial</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="date" class="form-control" id="dataFim" name="data_fim" value="{{ request.GET.data_fim }}">
+                                        <label for="dataFim">Data final</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Usuário" value="{{ request.GET.usuario }}">
+                                        <label for="usuario">Usuário</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="material" name="material" placeholder="Material" value="{{ request.GET.material }}">
+                                        <label for="material">Material</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="tipo" name="tipo">
+                                            <option value="" {% if not request.GET.tipo %}selected{% endif %}>Todos os tipos</option>
+                                            <option value="entrada" {% if request.GET.tipo == 'entrada' %}selected{% endif %}>Entrada</option>
+                                            <option value="retirada" {% if request.GET.tipo == 'retirada' %}selected{% endif %}>Retirada</option>
+                                            <option value="emprestimo" {% if request.GET.tipo == 'emprestimo' %}selected{% endif %}>Empréstimo</option>
+                                            <option value="devolucao" {% if request.GET.tipo == 'devolucao' %}selected{% endif %}>Devolução</option>
+                                        </select>
+                                        <label for="tipo">Tipo de movimentação</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="setor" name="setor" placeholder="Setor" value="{{ request.GET.setor }}">
+                                        <label for="setor">Setor</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3 d-flex gap-2">
+                                <button type="submit" class="btn btn-roxo px-4">Filtrar</button>
+                                <a href="{% url 'historico' %}" class="btn btn-outline-secondary px-4">Limpar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 mt-4">
+                    <div class="card-header bg-white fw-semibold">Movimentações registradas</div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Material</th>
+                                        <th>Tipo</th>
+                                        <th>Quantidade</th>
+                                        <th>Usuário responsável</th>
+                                        <th>Setor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for movimentacao in movimentacoes %}
+                                        <tr>
+                                            <td>{{ movimentacao.data|date:"d/m/Y" }}</td>
+                                            <td>{{ movimentacao.material.nome }}</td>
+                                            <td>{{ movimentacao.tipo|title }}</td>
+                                            <td>{{ movimentacao.quantidade }}</td>
+                                            <td>{{ movimentacao.usuario.username|default:"Não informado" }}</td>
+                                            <td>{{ movimentacao.setor|default:"Não informado" }}</td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted py-4">Nenhuma movimentação registrada.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

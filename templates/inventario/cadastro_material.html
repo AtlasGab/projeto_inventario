@@ -1,0 +1,150 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Material - Controle de Estoque</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">Controle de Estoque</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuTopo" aria-controls="menuTopo" aria-expanded="false" aria-label="Abrir menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="menuTopo">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <span class="nav-link">{{ request.user.username }}</span>
+                    </li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-link text-danger border-0 bg-transparent">Sair</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-lg-2 p-0">
+                <div class="sidebar d-flex flex-column p-3">
+                    <h5 class="text-center text-white mb-4">Menu</h5>
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'estoque' %}" class="nav-link">Consulta de Estoque</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'cadastro_material' %}" class="nav-link active">Cadastro de Material</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'entrada_material' %}" class="nav-link">Entrada de Material</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'retirada_material' %}" class="nav-link">Retirada de Material</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'emprestimo' %}" class="nav-link">Empréstimos</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'devolucao' %}" class="nav-link">Devoluções</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'historico' %}" class="nav-link">Histórico de Movimentações</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'relatorios' %}" class="nav-link">Relatórios</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{% url 'usuarios' %}" class="nav-link">Gerenciamento de Usuários</a>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+
+            <main class="col-lg-10 p-4">
+                <div class="mb-4">
+                    <h2 class="fw-bold">Cadastro de Material</h2>
+                    <p class="dashboard-descricao">Cadastre e gerencie os materiais do estoque.</p>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-white fw-semibold">Dados do Material</div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="nomeMaterial" name="nome" placeholder="Nome do Material" required>
+                                        <label for="nomeMaterial">Nome do Material</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="codigo" name="codigo" placeholder="Código" required>
+                                        <label for="codigo">Código</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="categoria" name="categoria">
+                                            <option value="" selected>Selecione uma categoria</option>
+                                        </select>
+                                        <label for="categoria">Categoria</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="quantidade" name="quantidade" placeholder="Quantidade" min="0" step="1" value="0">
+                                        <label for="quantidade">Quantidade</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="estoqueMinimo" name="estoque_minimo" placeholder="Estoque mínimo" min="0" step="1" value="0">
+                                        <label for="estoqueMinimo">Estoque Mínimo</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="localizacao" name="localizacao" placeholder="Localização">
+                                        <label for="localizacao">Localização Física</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="tipoMaterial" name="tipo">
+                                            <option value="" selected>Selecione o tipo</option>
+                                            <option value="consumivel">Consumível</option>
+                                            <option value="permanente">Permanente</option>
+                                        </select>
+                                        <label for="tipoMaterial">Tipo do Material</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 d-flex gap-2 flex-wrap">
+                                <button type="submit" class="btn btn-roxo px-4">Salvar</button>
+                                <button type="button" class="btn btn-outline-primary px-4">Editar</button>
+                                <button type="button" class="btn btn-outline-danger px-4">Excluir</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
